@@ -16,4 +16,3 @@ I built it because I was tired of relying on WhatsApp just to transfer PDFs, not
 * Graceful shutdown and reliable file transfers.
 * Future support for secure sharing beyond the local network.
 
-This project is also my way of learning idiomatic Go by building a complete application—from networking and cryptography to terminal UIs and web development.
