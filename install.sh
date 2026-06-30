@@ -57,6 +57,8 @@ detect_arch() {
 download() {
     local url="$1" dest="$2"
     if command -v curl &>/dev/null; then
+        # Use -f so a non-200 response returns a non-zero exit code that the
+        # caller's `if ! download ...` check can catch cleanly.
         curl -fsSL --progress-bar "$url" -o "$dest"
     elif command -v wget &>/dev/null; then
         wget -q --show-progress "$url" -O "$dest"
@@ -75,19 +77,23 @@ download_silent() {
 }
 
 fetch_text() {
+    # Note: no -f flag — we want empty output on 404, not a fatal exit
     if command -v curl &>/dev/null; then
-        curl -fsSL "$1" 2>/dev/null
+        curl -sSL "$1" 2>/dev/null || true
     else
-        wget -qO- "$1" 2>/dev/null
+        wget -qO- "$1" 2>/dev/null || true
     fi
 }
 
 # ── GitHub release version ────────────────────────────────────────────────────
 
 get_latest_version() {
+    # grep returns exit code 1 when no match — guard with || true so pipefail
+    # doesn't kill the script when the repo has no releases yet.
     fetch_text "$GITHUB_API" \
         | grep '"tag_name"' \
-        | sed -E 's/.*"tag_name": *"([^"]+)".*/\1/'
+        | sed -E 's/.*"tag_name": *"([^"]+)".*/\1/' \
+        || true
 }
 
 # ── Binary installation ───────────────────────────────────────────────────────
@@ -260,7 +266,7 @@ main() {
     info "Fetching latest release..."
 
     local version
-    version="$(get_latest_version)"
+    version="$(get_latest_version)" || version=""
 
     if [ -z "$version" ]; then
         warn "Could not reach GitHub API. Falling back to source build."
