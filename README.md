@@ -5,7 +5,17 @@ A secure, self-hosted file sharing tool for your personal devices.
 Share exposes a directory from your machine over the local network (or beyond) with a clean web UI — no cloud, no accounts, no passwords. New devices are authenticated with public-key cryptography: each browser generates an ECDSA key pair, and you approve connections directly from the terminal.
 
 ---
+## Installation
 
+### One-line install (Linux / macOS)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/jg-eno/Share/main/install.sh | bash
+```
+
+The script auto-detects your OS and architecture, downloads the appropriate pre-built binary from GitHub Releases, and installs it to `/usr/local/bin`. If no binary is available for your platform it falls back to building from source (requires Go 1.21+).
+
+---
 ## Features
 
 - **Passwordless device authentication** — browsers generate an ECDSA P-256 key pair on first visit; you approve each device from the TUI with a single keypress
@@ -18,17 +28,34 @@ Share exposes a directory from your machine over the local network (or beyond) w
 - **Upload support** — drag and drop or click to upload files up to 10 GB
 
 ---
+## Project structure
 
-## Installation
-
-### One-line install (Linux / macOS)
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/jg-eno/Share/main/install.sh | bash
+```
+share/
+├── cmd/
+│   ├── root.go          # Cobra root command
+│   └── serve.go         # serve subcommand
+├── internal/
+│   ├── network/
+│   │   └── ip.go        # Local IP detection
+│   └── server/
+│       ├── auth.go      # Device store, signature verification
+│       ├── file_server.go  # HTTP handlers and auth endpoints
+│       ├── server.go    # Server struct and helpers
+│       ├── tui.go       # Bubble Tea terminal UI
+│       ├── web.go       # Embedded static assets
+│       ├── auth_test.go
+│       ├── server_test.go
+│       └── web/
+│           ├── app.js
+│           ├── index.html
+│           └── style.css
+├── install.sh
+├── main.go
+└── go.mod
 ```
 
-The script auto-detects your OS and architecture, downloads the appropriate pre-built binary from GitHub Releases, and installs it to `/usr/local/bin`. If no binary is available for your platform it falls back to building from source (requires Go 1.21+).
-
+---
 ### Build from source
 
 ```bash
@@ -180,35 +207,6 @@ The security trade-off: without a cryptographic signature, a session cannot be c
 | Device ID (simple mode) | Browser `localStorage` | Random hex, no key material |
 | Approved devices | `~/.share_devices.json` | Name, public key / device ID, status, date |
 | Active sessions | Server memory only | Cleared on server restart |
-
----
-
-## Project structure
-
-```
-share/
-├── cmd/
-│   ├── root.go          # Cobra root command
-│   └── serve.go         # serve subcommand
-├── internal/
-│   ├── network/
-│   │   └── ip.go        # Local IP detection
-│   └── server/
-│       ├── auth.go      # Device store, signature verification
-│       ├── file_server.go  # HTTP handlers and auth endpoints
-│       ├── server.go    # Server struct and helpers
-│       ├── tui.go       # Bubble Tea terminal UI
-│       ├── web.go       # Embedded static assets
-│       ├── auth_test.go
-│       ├── server_test.go
-│       └── web/
-│           ├── app.js
-│           ├── index.html
-│           └── style.css
-├── install.sh
-├── main.go
-└── go.mod
-```
 
 ---
 
