@@ -24,7 +24,7 @@ Share exposes a directory from your machine over the local network (or beyond) w
 ### One-line install (Linux / macOS)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/glenenosh/share/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jg-eno/Share/main/install.sh | bash
 ```
 
 The script auto-detects your OS and architecture, downloads the appropriate pre-built binary from GitHub Releases, and installs it to `/usr/local/bin`. If no binary is available for your platform it falls back to building from source (requires Go 1.21+).
@@ -32,7 +32,7 @@ The script auto-detects your OS and architecture, downloads the appropriate pre-
 ### Build from source
 
 ```bash
-git clone https://github.com/glenenosh/share.git
+git clone https://github.com/jg-eno/Share.git
 cd share
 go build -o share .
 sudo mv share /usr/local/bin/

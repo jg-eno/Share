@@ -2,7 +2,7 @@
 # Share — Universal Installer
 #
 # One-line install:
-#   curl -fsSL https://raw.githubusercontent.com/glenenosh/share/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/jg-eno/Share/main/install.sh | bash
 #
 # Downloads a pre-built binary for your OS/arch from GitHub Releases,
 # verifies it, and installs it to /usr/local/bin (or ~/bin as fallback).
@@ -11,7 +11,7 @@
 set -euo pipefail
 
 # ── Configuration ────────────────────────────────────────────────────────────
-REPO="glenenosh/share"
+REPO="jg-eno/Share"
 BINARY_NAME="share"
 INSTALL_DIR="/usr/local/bin"
 FALLBACK_DIR="$HOME/.local/bin"
