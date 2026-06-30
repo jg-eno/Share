@@ -1,11 +1,12 @@
 package cmd
 
 import (
-	"log"
+	"fmt"
 
 	"share/internal/network"
 	"share/internal/server"
 
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 )
 
@@ -17,6 +18,7 @@ var (
 var serveCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "Start the HTTP file server",
+	Args:  cobra.NoArgs,
 
 	RunE: func(cmd *cobra.Command, args []string) error {
 
@@ -25,12 +27,32 @@ var serveCmd = &cobra.Command{
 			return err
 		}
 
-		log.Printf("Serving %s", rootDir)
-		log.Printf("Address: http://%s:%d", ip, port)
+		serverAddr := fmt.Sprintf("http://%s:%d", ip, port)
 
+		isInteractive := !cmd.Flags().Changed("dir")
+
+		logChan := make(chan string, 100)
 		srv := server.New(rootDir, port)
+		srv.LogChan = logChan
 
-		return srv.Start()
+		// If dir is explicitly provided, start the server in background immediately.
+		// Otherwise, the TUI picker will handle starting the server.
+		if !isInteractive {
+			go func() {
+				if err := srv.Start(); err != nil {
+					logChan <- fmt.Sprintf("Error starting server: %v", err)
+				}
+			}()
+		}
+
+		// Run TUI in the foreground (interactive picker or monitor)
+		model := server.NewTuiModel(srv, serverAddr, isInteractive)
+		p := tea.NewProgram(model)
+		if _, err := p.Run(); err != nil {
+			return err
+		}
+
+		return nil
 	},
 }
 
